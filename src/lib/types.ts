@@ -11,10 +11,14 @@ export interface Message {
   }
   
   export interface SpeechRecognition extends EventTarget {
+    onerror: (event: any) => void;
+    interimResults: boolean;
+    continuous: boolean;
     start: () => void;
     stop: () => void;
     onresult: (event: SpeechRecognitionEvent) => void;
     onend: () => void;
+    running : boolean
   }
   
   export interface SpeechRecognitionEvent {
@@ -22,6 +26,7 @@ export interface Message {
       transcript: string;
     }[][];
     resultIndex: number;
+    
   }
   
   declare global {

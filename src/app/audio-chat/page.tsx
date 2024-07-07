@@ -6,11 +6,10 @@ import { AudioVisualizer } from '@/components/AudioVisualizer';
 import { StatusIndicator } from '@/components/StatusIndicator';
 import { TranscriptDisplay } from '@/components/TranscriptDisplay';
 import { toast } from "@/components/ui/use-toast";
-import { AIMessages, SpeechRecognition } from '@/lib/types';
+import { AIMessages, SpeechRecognition, SpeechRecognitionEvent } from '@/lib/types';
 import { systemPrompt } from '@/lib/prompts';
 import { modelList as models } from '@/lib/models';
 import axios from 'axios';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TabsContent } from '@radix-ui/react-tabs';
 import { cn, parseMessageContent } from '@/lib/utils';
@@ -147,13 +146,13 @@ const AudioChat: React.FC = () => {
 
 
 
-    const handleRecognitionResult = useCallback(async (event: SpeechRecognitionEvent) => {
+    const handleRecognitionResult = useCallback(async (event: any) => {
         let interimTranscript = '';
         let finalTranscript = '';
 
         for (let i = event.resultIndex; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript;
-            if (event.results[i].isFinal) {
+            if (event.results[i]?.isFinal) {
                 finalTranscript += transcript + ' ';
             } else {
                 interimTranscript += transcript;
@@ -183,7 +182,7 @@ const AudioChat: React.FC = () => {
         }
     }, [handleRecognitionResult]);
 
-    const handleRecognitionError = (event: SpeechRecognitionErrorEvent) => {
+    const handleRecognitionError = (event: any) => {
         console.error('Speech recognition error', event.error);
         toast({
             title: "Speech Recognition Error",
@@ -229,7 +228,7 @@ const AudioChat: React.FC = () => {
     const startVisualization = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            audioContext.current = new (window.AudioContext || window.webkitAudioContext)();
+            audioContext.current = new (window.AudioContext)();
             analyser.current = audioContext.current.createAnalyser();
             const source = audioContext.current.createMediaStreamSource(stream);
             source.connect(analyser.current);
@@ -402,7 +401,7 @@ const AudioChat: React.FC = () => {
                         <div className="grid grid-cols-2 overflow-scroll">
                             <div className="h-full">
 
-                                <TranscriptDisplay transcript={transcript} history={transcriptHistory} className='border-4 h-80' />
+                                <TranscriptDisplay transcript={transcript} className='border-4 h-80' />
 
                                 <div className="overflow-scroll border-4 h-80">
                                     <pre className=''>
